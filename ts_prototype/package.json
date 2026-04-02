@@ -1,0 +1,13 @@
+{
+  "name": "intent-to-action",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "demo": "node --experimental-strip-types src/cli.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
