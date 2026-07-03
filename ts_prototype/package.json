@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
-    "demo": "node --experimental-strip-types src/cli.ts"
+    "build": "tsc -p tsconfig.json",
+    "test": "node --experimental-strip-types --test ../ts_prototype_tests/*.test.ts",
+    "demo": "node --experimental-strip-types cli.ts"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

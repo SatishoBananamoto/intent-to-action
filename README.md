@@ -2,23 +2,43 @@
 
 Safety harness for LLM agent execution. The model proposes, the harness decides.
 
+## Current public snapshot
+
+This repo contains a runnable Python harness plus a TypeScript prototype:
+
+- `harness/` — Python pipeline for proposal interpretation, registry lookup, deterministic policy, checks, execution, effects, obligations, lifecycle state, SDK helpers, SQLite persistence, dashboard queries, and CLI demos.
+- `tests/` — Python regression suite covering policy routing, lifecycle, SDK registration, intent classification, dashboard queries, scheduler behavior, and store persistence.
+- `ts_prototype/` and `ts_prototype_tests/` — TypeScript prototype and Node test matrix.
+- `prior_work/` — historical assumptions, decisions, MVP spec, and test matrix used while shaping the prototype.
+
+This is an experimental local-first harness, not a production sandbox. It does not execute untrusted code, provide process isolation, or replace OS/container-level controls.
+
 ## What it does
 
-Intercepts agent actions before execution, evaluates them through a deterministic policy pipeline, tracks effects, and enforces obligations.
+Intercepts proposed agent actions before execution, evaluates them through a deterministic policy pipeline, tracks emitted effects, and enforces follow-up obligations.
 
-```
-Proposal → Registry → Policy → Checks → Execute → Effects → Obligations
+```text
+Proposal -> Registry -> Policy -> Checks -> Execute -> Effects -> Obligations
 ```
 
 ## Quick start
 
 ```bash
-pip install -e .
-python3 -m pytest tests/ -q
-python3 -m harness.cli        # demo scenarios
+pip install -e ".[dev]"
+python3 -m pytest -q
+python3 -m harness.cli
 ```
 
-## SDK — register actions in 10 lines
+For the TypeScript prototype:
+
+```bash
+cd ts_prototype
+npm install
+npm test
+npm run build
+```
+
+## SDK example
 
 ```python
 from harness.sdk import action, EffectBuilder
@@ -31,8 +51,12 @@ from harness.sdk import action, EffectBuilder
 )
 def produce_artifact(args, resolution, now_iso, fx: EffectBuilder):
     fx.mutate("workspace", "write", f"produced {args['kind']}")
-    fx.obligate("review", due_minutes=10, verify="poll",
-                failure_mode="Not reviewed")
+    fx.obligate(
+        "review",
+        due_minutes=10,
+        verify="poll",
+        failure_mode="Not reviewed",
+    )
 ```
 
 ## Components
@@ -40,15 +64,27 @@ def produce_artifact(args, resolution, now_iso, fx: EffectBuilder):
 | Module | What it does |
 |--------|-------------|
 | `harness/types.py` | Core type definitions |
-| `harness/registry.py` | Action registry with 3 MVP adapters |
+| `harness/registry.py` | Action registry with MVP adapters |
 | `harness/policy.py` | Deterministic policy engine |
-| `harness/checks.py` | Check runner (local + external) |
+| `harness/checks.py` | Check runner for local and external check specs |
 | `harness/executor.py` | Action executor with effect materialization |
-| `harness/store.py` | Effect store protocol + in-memory implementation |
+| `harness/store.py` | Effect store protocol and in-memory implementation |
 | `harness/sqlite_store.py` | Persistent SQLite effect store |
-| `harness/obligations.py` | Obligation engine (sweep, breach, escalate) |
+| `harness/obligations.py` | Obligation engine for sweep, breach, and escalation |
 | `harness/state.py` | Proposal lifecycle state machine |
-| `harness/sdk.py` | `@action` decorator, `EffectBuilder`, hook decorators |
-| `harness/intent.py` | Intent classifier (free text → action types) |
-| `harness/dashboard.py` | Inspector API + CLI for querying state |
+| `harness/sdk.py` | `@action`, `EffectBuilder`, and hook decorators |
+| `harness/intent.py` | Regex intent classifier from free text to action types |
+| `harness/dashboard.py` | Inspector API and CLI helpers for querying state |
 | `harness/core.py` | Pipeline orchestrator |
+
+## Verification
+
+Current local verification:
+
+```bash
+python3 -m pytest -q                    # 162 passed
+python3 -m compileall -q harness tests
+npm --prefix ts_prototype test
+npm --prefix ts_prototype run build
+python3 tools/check_public_surface.py
+```

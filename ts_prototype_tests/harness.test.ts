@@ -1,9 +1,9 @@
 import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert/strict";
-import { Harness } from "../src/harness.ts";
-import { ActionRegistry } from "../src/registry.ts";
-import { resetActionCounter } from "../src/executor.ts";
-import type { Proposal, Resolution } from "../src/types.ts";
+import { Harness } from "../ts_prototype/harness.ts";
+import { ActionRegistry } from "../ts_prototype/registry.ts";
+import { resetActionCounter } from "../ts_prototype/executor.ts";
+import type { Proposal, Resolution } from "../ts_prototype/types.ts";
 
 // --- Test helpers ---
 
@@ -554,6 +554,8 @@ describe("Safety Budget", () => {
       cheapChecks: [],
       approvalPolicy: "never",
       preconditions: [],
+      entitySelectors: [],
+      resourceSelectors: [],
       effectTemplate: (_args, _res, _now) => ({
         mutations: [{ resource: "test", op: "test", summary: "test" }],
         commitments: [],
@@ -593,6 +595,8 @@ describe("Regression checks", () => {
       cheapChecks: [],
       approvalPolicy: "never",
       preconditions: [],
+      entitySelectors: [],
+      resourceSelectors: [],
       effectTemplate: (_a, _r, _n) => ({
         mutations: [{ resource: "t", op: "t", summary: "t" }],
         commitments: [],

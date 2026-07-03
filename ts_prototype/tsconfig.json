@@ -5,13 +5,10 @@
     "moduleResolution": "Node16",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "declaration": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["tests"]
+  "include": ["*.ts", "../ts_prototype_tests/*.ts"]
 }
